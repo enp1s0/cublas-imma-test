@@ -29,7 +29,7 @@ void run(
 					mat_b_uptr.get(), CUDA_R_8I, k,
 					&beta,
 					mat_c_uptr.get(), CUDA_R_32I, m,
-					CUBLAS_COMPUTE_32F,
+					CUBLAS_COMPUTE_32I,
 					CUBLAS_GEMM_DEFAULT_TENSOR_OP
 					));
 	}
