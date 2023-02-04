@@ -49,6 +49,7 @@ void run(
 int main(int argc, char **argv) {
 	if (argc < 1 + 3 + 1) {
 		std::fprintf(stderr, "Usage: %s [m] [n] [k] [test_count]\n", argv[0]);
+		return 1;
 	}
 	const auto m = std::stoul(argv[1]);
 	const auto n = std::stoul(argv[2]);
