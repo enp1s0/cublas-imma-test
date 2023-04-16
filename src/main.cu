@@ -2,7 +2,9 @@
 #include <chrono>
 #include <cutf/memory.hpp>
 #include <cutf/cublas.hpp>
+#include <cutf/type.hpp>
 
+template <class INPUT_T, class OUTPUT_T>
 void run(
 		const std::size_t m,
 		const std::size_t n,
@@ -11,9 +13,22 @@ void run(
 		) {
 	auto cublas_handle = cutf::cublas::get_cublas_unique_ptr();
 
-	auto mat_a_uptr = cutf::memory::get_device_unique_ptr<std::int8_t>(m * k);
-	auto mat_b_uptr = cutf::memory::get_device_unique_ptr<std::int8_t>(k * n);
-	auto mat_c_uptr = cutf::memory::get_device_unique_ptr<std::int32_t>(m * n);
+	auto mat_a_uptr = cutf::memory::get_device_unique_ptr<INPUT_T>(m * k);
+	auto mat_b_uptr = cutf::memory::get_device_unique_ptr<INPUT_T>(k * n);
+	auto mat_c_uptr = cutf::memory::get_device_unique_ptr<OUTPUT_T>(m * n);
+
+	cublasComputeType_t compute_type;
+	cudaDataType_t input_data_type, output_data_type;
+	if (std::is_same<INPUT_T, std::int8_t>::value && std::is_same<OUTPUT_T, std::int32_t>::value) {
+		compute_type = CUBLAS_COMPUTE_32I;
+		input_data_type = CUDA_R_8I;
+		output_data_type = CUDA_R_32I;
+	}
+	if (std::is_same<INPUT_T, half       >::value && std::is_same<OUTPUT_T, float       >::value) {
+		compute_type = CUBLAS_COMPUTE_32F_FAST_16F;
+		input_data_type = CUDA_R_16F;
+		output_data_type = CUDA_R_32F;
+	}
 
 	cudaDeviceSynchronize();
 	const auto start_closk = std::chrono::system_clock::now();
@@ -25,11 +40,11 @@ void run(
 					CUBLAS_OP_T, CUBLAS_OP_N,
 					m, n, k,
 					&alpha,
-					mat_a_uptr.get(), CUDA_R_8I, k,
-					mat_b_uptr.get(), CUDA_R_8I, k,
+					mat_a_uptr.get(), input_data_type, k,
+					mat_b_uptr.get(), input_data_type, k,
 					&beta,
-					mat_c_uptr.get(), CUDA_R_32I, m,
-					CUBLAS_COMPUTE_32I,
+					mat_c_uptr.get(), output_data_type, m,
+					compute_type,
 					CUBLAS_GEMM_DEFAULT_TENSOR_OP
 					));
 	}
@@ -47,14 +62,20 @@ void run(
 }
 
 int main(int argc, char **argv) {
-	if (argc < 1 + 3 + 1) {
-		std::fprintf(stderr, "Usage: %s [m] [n] [k] [test_count]\n", argv[0]);
+	if (argc < 1 + 1 + 3 + 1) {
+		std::fprintf(stderr, "Usage: %s [mode] [m] [n] [k] [test_count]\n", argv[0]);
+		std::fprintf(stderr, "- mode : I8I32 F16F32\n");
 		return 1;
 	}
-	const auto m = std::stoul(argv[1]);
-	const auto n = std::stoul(argv[2]);
-	const auto k = std::stoul(argv[3]);
-	const auto num_tests  = std::stoul(argv[4]);
+	const std::string mode = argv[1];
+	const auto m = std::stoul(argv[2]);
+	const auto n = std::stoul(argv[3]);
+	const auto k = std::stoul(argv[4]);
+	const auto num_tests  = std::stoul(argv[5]);
 
-	run(m, n, k, num_tests);
+	if (mode == "I8I32") {
+		run<signed char, int>(m, n, k, num_tests);
+	} else if (mode == "F16F32") {
+		run<half, float>(m, n, k, num_tests);
+	}
 }
