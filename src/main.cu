@@ -73,6 +73,7 @@ int main(int argc, char **argv) {
 	const auto k = std::stoul(argv[4]);
 	const auto num_tests  = std::stoul(argv[5]);
 
+	std::printf("%s,", mode.c_str());
 	if (mode == "I8I32") {
 		run<signed char, int>(m, n, k, num_tests);
 	} else if (mode == "F16F32") {
