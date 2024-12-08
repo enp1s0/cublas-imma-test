@@ -14,7 +14,7 @@ std::size_t round_up(const std::size_t n) {
 }
 
 template <class INPUT_T, class OUTPUT_T>
-void run(
+void run_cublas(
     const std::size_t m_,
     const std::size_t n_,
     const std::size_t k_,
@@ -88,8 +88,8 @@ int main(int argc, char **argv) {
 
   std::printf("%s,", mode.c_str());
   if (mode == "I8I32") {
-    run<signed char, int>(m, n, k, num_tests);
+    run_cublas<signed char, int>(m, n, k, num_tests);
   } else if (mode == "F16F32") {
-    run<half, float>(m, n, k, num_tests);
+    run_cublas<half, float>(m, n, k, num_tests);
   }
 }
