@@ -13,6 +13,21 @@ std::size_t round_up(const std::size_t n) {
   return ((n + ns - 1) / ns) * ns;
 }
 
+void print_result(
+    const std::size_t m,
+    const std::size_t n,
+    const std::size_t k,
+    const double elapsed_time,
+    const std::uint32_t num_tests
+    ) {
+  const auto num_ops = 2lu * m * n * k * num_tests;
+  const auto throughput = num_ops / elapsed_time;
+  std::printf("%lu,%lu,%lu,%e\n",
+              m, n, k,
+              throughput * 1e-12
+             );
+}
+
 template <class INPUT_T, class OUTPUT_T>
 void run_cublas(
     const std::size_t m_,
@@ -66,12 +81,7 @@ void run_cublas(
   const auto end_closk = std::chrono::system_clock::now();
 
   const auto elapsed_time = std::chrono::duration_cast<std::chrono::nanoseconds>(end_closk - start_closk).count() * 1e-9;
-  const auto num_ops = 2lu * m * n * k * num_tests;
-  const auto throughput = num_ops / elapsed_time;
-  std::printf("%lu,%lu,%lu,%e\n",
-              m_, n_, k_,
-              throughput * 1e-12
-             );
+  print_result(m_, n_, k_, elapsed_time, num_tests);
 }
 
 int main(int argc, char **argv) {
