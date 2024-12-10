@@ -126,7 +126,7 @@ void run_cublaslt(
       cutf::type::get_data_type<OUTPUT_T>()
       );
   CUTF_CHECK_ERROR(cublasLtMatmulDescSetAttribute(*cublaslt_op_desc.get(), CUBLASLT_MATMUL_DESC_TRANSA, &trans_A, sizeof(trans_A)));
-  CUTF_CHECK_ERROR(cublasLtMatmulDescSetAttribute(*cublaslt_op_desc.get(), CUBLASLT_MATMUL_DESC_TRANSB, &trans_B, sizeof(trans_A)));
+  CUTF_CHECK_ERROR(cublasLtMatmulDescSetAttribute(*cublaslt_op_desc.get(), CUBLASLT_MATMUL_DESC_TRANSB, &trans_B, sizeof(trans_B)));
 
 
   auto cublaslt_preference_uptr = cutf::cublaslt::create_preference_unique_ptr();
