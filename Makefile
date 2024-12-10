@@ -1,9 +1,10 @@
 NVCC=nvcc
 NVCCFLAGS=-std=c++17
+NVCCFLAGS+=-gencode arch=compute_90,code=sm_90
 NVCCFLAGS+=-gencode arch=compute_89,code=sm_89
 NVCCFLAGS+=-gencode arch=compute_80,code=sm_80
 NVCCFLAGS+=-gencode arch=compute_75,code=sm_75
-NVCCFLAGS+=-I./src/cutf/include -lcublas
+NVCCFLAGS+=-I./src/cutf/include -lcublas -lcublasLt
 
 TARGET=cublas-imma.test
 
