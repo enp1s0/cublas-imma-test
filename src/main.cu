@@ -196,7 +196,7 @@ void run_cublaslt(
 int main(int argc, char **argv) {
   if (argc < 1 + 1 + 3 + 1) {
     std::fprintf(stderr, "Usage: %s [mode] [m] [n] [k] [test_count]\n", argv[0]);
-    std::fprintf(stderr, "- mode : I8I32 F16F32\n");
+    std::fprintf(stderr, "- mode : I8I32 F16F32 E4M3F32\n");
     return 1;
   }
   const std::string mode = argv[1];
@@ -210,8 +210,8 @@ int main(int argc, char **argv) {
     run_cublas<signed char, int>(m, n, k, num_tests);
   } else if (mode == "F16F32") {
     run_cublaslt<half, float>(m, n, k, num_tests);
-  } else if (mode == "E5M2F32") {
-    run_cublaslt<__nv_fp8_e5m2, float>(m, n, k, num_tests);
+  //} else if (mode == "E5M2F32") {
+  //  run_cublaslt<__nv_fp8_e5m2, float>(m, n, k, num_tests);
   } else if (mode == "E4M3F32") {
     run_cublaslt<__nv_fp8_e4m3, float>(m, n, k, num_tests);
   }
